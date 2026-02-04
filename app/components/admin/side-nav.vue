@@ -20,23 +20,9 @@ const navigation = ref<NavItem[]>([
     to: '/admin/users'
   },
   {
-    label: 'Products',
+    label: 'Menus',
     icon: 'i-heroicons-cube',
-    to: '/admin/products'
-  },
-  {
-    label: 'Catalog',
-    icon: 'i-heroicons-folder',
-    children: [
-      { label: 'Categories', icon: 'i-heroicons-tag', to: '/admin/catalog/categories' },
-      { label: 'Brands', icon: 'i-heroicons-bookmark', to: '/admin/catalog/brands' },
-      { label: 'Attributes', icon: 'i-heroicons-list-bullet', to: '/admin/catalog/attributes' }
-    ]
-  },
-  {
-    label: 'Orders',
-    icon: 'i-heroicons-shopping-cart',
-    to: '/admin/orders'
+    to: '/admin/menus'
   },
   {
     label: 'Analytics',

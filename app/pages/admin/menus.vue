@@ -1,13 +1,11 @@
 <template>
-    <NuxtPage/>
+
+  <NuxtPage />
+
 </template>
 
 <script lang="ts" setup>
 definePageMeta({
-  layout: 'admin'
+  layout: "menu"
 })
 </script>
-
-<style>
-
-</style>

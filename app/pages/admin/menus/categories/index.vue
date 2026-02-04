@@ -1,11 +1,11 @@
 <template>
-    <NuxtPage/>
+  <div>
+    <h1>category page</h1>
+  </div>
 </template>
 
 <script lang="ts" setup>
-definePageMeta({
-  layout: 'admin'
-})
+
 </script>
 
 <style>
