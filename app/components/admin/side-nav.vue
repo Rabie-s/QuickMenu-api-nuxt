@@ -15,14 +15,9 @@ const navigation = ref<NavItem[]>([
     to: '/admin'
   },
   {
-    label: 'Users',
-    icon: 'i-heroicons-users',
-    to: '/admin/users'
-  },
-  {
-    label: 'Products',
+    label: 'My Menus',
     icon: 'i-heroicons-cube',
-    to: '/admin/products'
+    to: '/admin/my-menus'
   },
   {
     label: 'Catalog',
@@ -33,25 +28,6 @@ const navigation = ref<NavItem[]>([
       { label: 'Attributes', icon: 'i-heroicons-list-bullet', to: '/admin/catalog/attributes' }
     ]
   },
-  {
-    label: 'Orders',
-    icon: 'i-heroicons-shopping-cart',
-    to: '/admin/orders'
-  },
-  {
-    label: 'Analytics',
-    icon: 'i-heroicons-chart-bar',
-    children: [
-      { label: 'Overview', icon: 'i-heroicons-chart-pie', to: '/admin/analytics/overview' },
-      { label: 'Sales', icon: 'i-heroicons-currency-dollar', to: '/admin/analytics/sales' },
-      { label: 'Reports', icon: 'i-heroicons-document-text', to: '/admin/analytics/reports' }
-    ]
-  },
-  {
-    label: 'Settings',
-    icon: 'i-heroicons-cog-6-tooth',
-    to: '/admin/settings'
-  }
 ])
 
 const openDropdowns = ref<Set<string>>(new Set())

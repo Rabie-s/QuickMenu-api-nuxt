@@ -1,9 +1,9 @@
 <template>
   <admin-menu-side-nav />
-  <!-- Main Content Area -->
-  <main class="pt-16 lg:pl-64 m-10">
-    <slot />
-  </main>
+
+    <main class="pt-16 lg:pl-64 p-4">
+      <slot />
+    </main>
 </template>
 
 <script lang="ts" setup>

@@ -2,11 +2,11 @@
   <UDashboardGroup>
     <admin-side-nav />
     <!-- Main Content Area -->
-    <main class="pt-16 lg:pl-64">
-      <!-- Page content goes here -->
-      <slot />
-    </main>
   </UDashboardGroup>
+  <main class="pt-16 lg:pl-64 p-4">
+    <!-- Page content goes here -->
+    <slot />
+  </main>
 
 </template>
 
