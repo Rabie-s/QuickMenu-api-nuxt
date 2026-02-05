@@ -1,88 +1,76 @@
 <template>
-  <div class="max-w-2xl mx-auto px-4 py-6">
+  <div class="space-y-6">
     <!-- Header -->
-    <div class="mb-6">
-      <div class="flex items-center gap-4 mb-4">
-        <UButton
-          icon="i-lucide-arrow-left"
-          color="neutral"
-          variant="ghost"
-          to="/admin/my-menus"
-        >
-          Back
-        </UButton>
-        <h1 class="text-2xl font-bold">Create New Menu</h1>
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Create New Menu</h1>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Fill in the details to create a new menu</p>
       </div>
-      <p class="text-sm text-gray-500 dark:text-gray-400">Fill in the details to create a new menu</p>
     </div>
 
-    <!-- Form -->
+    <!-- Form Card -->
     <UCard>
-      <UForm :state="form" :loading-auto="false" @submit="handleSubmit" class="space-y-6">
-        <!-- Menu Name -->
+      <UForm :state="form" @submit="handleSubmit" class="space-y-6">
+        <!-- Name Field -->
         <UFormField label="Menu Name" name="name" required>
           <UInput
             v-model="form.name"
-            placeholder="e.g., Lunch Menu, Dinner Menu"
+            placeholder="Enter menu name"
             size="lg"
+            class="w-full"
           />
         </UFormField>
 
-        <!-- Cover Image -->
-        <UFormField label="Cover Image" name="coverImage" required>
+        <!-- Cover Image Field -->
+        <UFormField label="Cover Image" name="cover_image">
           <div class="space-y-3">
-            <!-- Image Preview -->
-            <div v-if="form.coverImage" class="relative w-full h-48 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
-              <img
-                :src="form.coverImage"
-                alt="Cover preview"
-                class="w-full h-full object-cover"
-              >
-              <UButton
-                icon="i-lucide-x"
-                color="error"
-                variant="solid"
-                size="sm"
-                class="absolute top-2 right-2"
-                @click="form.coverImage = ''"
-              />
-            </div>
-            <!-- Empty State -->
-            <div v-else class="w-full h-48 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700 flex items-center justify-center">
-              <div class="text-center text-gray-500 dark:text-gray-400">
-                <UIcon name="i-lucide-image" class="text-4xl mb-2" />
-                <p class="text-sm">No image selected</p>
-              </div>
-            </div>
-            <!-- URL Input -->
             <UInput
-              v-model="form.coverImage"
-              placeholder="Enter image URL"
+              type="file"
+              accept="image/*"
+              @change="handleFileChange"
               size="lg"
+              class="w-full"
             />
+            <p v-if="coverImageName" class="text-sm text-gray-500 dark:text-gray-400">
+              Selected: {{ coverImageName }}
+            </p>
           </div>
         </UFormField>
 
-        <!-- Is Available -->
-        <UFormField name="isAvailable">
-          <UCheckbox v-model="form.isAvailable" size="lg">
-            <template #label>
-              <span class="text-base">Make this menu available to customers</span>
-            </template>
-          </UCheckbox>
+        <!-- Is Available Toggle -->
+        <UFormField label="Availability" name="is_available">
+          <div class="flex items-center gap-3">
+            <UToggle v-model="form.is_available" size="md" />
+            <span class="text-sm text-gray-600 dark:text-gray-400">
+              {{ form.is_available ? 'Available' : 'Unavailable' }}
+            </span>
+          </div>
         </UFormField>
 
-        <!-- Actions -->
-        <div class="flex flex-col sm:flex-row items-center gap-3 pt-4 border-t border-gray-200 dark:border-gray-800">
-          <UButton @click="console.log('nott')" type="submit" size="lg" :loading="loading" class="w-full sm:w-auto">
+        <!-- Image Preview -->
+        <div v-if="coverImagePreview" class="space-y-2">
+          <p class="text-sm font-medium text-gray-900 dark:text-white">Preview</p>
+          <div class="relative w-full max-w-sm">
+            <img
+              :src="coverImagePreview"
+              alt="Cover image preview"
+              class="w-full h-48 object-cover rounded-lg border border-gray-200 dark:border-gray-700"
+            />
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <UDivider />
+
+        <div class="flex items-center gap-3">
+          <UButton type="submit" size="lg" :loading="isSubmitting">
             Create Menu
           </UButton>
           <UButton
-            color="neutral"
+            to="/admin/my-menus"
             variant="outline"
             size="lg"
-            to="/admin/my-menus"
-            class="w-full sm:w-auto"
+            color="neutral"
           >
             Cancel
           </UButton>
@@ -92,26 +80,61 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 const form = reactive({
   name: '',
-  coverImage: '',
-  isAvailable: true
+  cover_image: null as File | null,
+  is_available: true
 })
 
-const loading = ref(false)
+const coverImagePreview = ref<string | null>(null)
+const coverImageName = ref<string>('')
+const isSubmitting = ref(false)
 
-const handleSubmit = async () => {
-  loading.value = true
-  console.log('Creating menu:', form)
-  // TODO: Implement create menu logic
-  setTimeout(() => {
-    loading.value = false
-    // navigateTo('/admin/my-menus')
-  }, 1000)
+const handleFileChange = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+
+  if (file) {
+    form.cover_image = file
+    coverImageName.value = file.name
+
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      coverImagePreview.value = e.target?.result as string
+    }
+    reader.readAsDataURL(file)
+  }
 }
 
-useHead({
-  title: 'Create New Menu'
-})
+const handleSubmit = async () => {
+  isSubmitting.value = true
+
+  try {
+    const formData = new FormData()
+    formData.append('name', form.name)
+    formData.append('is_available', String(form.is_available))
+    if (form.cover_image) {
+      formData.append('cover_image', form.cover_image)
+    }
+
+    // TODO: Replace with your actual API endpoint
+    // await $fetch('/api/menus', {
+    //   method: 'POST',
+    //   body: formData
+    // })
+
+    console.log('Form submitted:', {
+      name: form.name,
+      is_available: form.is_available,
+      cover_image: form.cover_image?.name
+    })
+
+    await navigateTo('/admin/my-menus')
+  } catch (error) {
+    console.error('Error creating menu:', error)
+  } finally {
+    isSubmitting.value = false
+  }
+}
 </script>
