@@ -242,5 +242,10 @@ watch(() => route.path, () => {
         </ul>
       </nav>
     </aside>
+
+    <!-- Main Content -->
+    <main class="lg:ml-64 pt-16 min-h-screen">
+      <slot />
+    </main>
   </div>
 </template>

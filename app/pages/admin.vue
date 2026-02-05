@@ -1,7 +1,7 @@
 <template>
-  <div class="p-5">
+  
     <NuxtPage />
-  </div>
+ 
 </template>
 
 <script lang="ts" setup>
