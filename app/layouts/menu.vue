@@ -1,5 +1,5 @@
 <template>
-  <admin-menu-side-nav />
+  <AdminMenuSideNav />
 
     <main class="pt-16 lg:pl-64 p-4">
       <slot />

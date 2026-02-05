@@ -1,7 +1,7 @@
 <template>
   <AdminRestaurantCard
     title="Restaurant Name"
-    description="Custom description"
+    
     @details="handleDetails"
     @edit="handleEdit"
     @delete="handleDelete"

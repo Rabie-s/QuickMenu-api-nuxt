@@ -1,6 +1,6 @@
 <template>
   <UDashboardGroup>
-    <admin-side-nav />
+    <AdminSideNav />
     <!-- Main Content Area -->
   </UDashboardGroup>
   <main class="pt-16 lg:pl-64 p-4">
