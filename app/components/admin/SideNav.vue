@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core'
 
+const colorMode = useColorMode()
+
 interface NavItem {
   label: string
   icon: string
@@ -106,6 +108,18 @@ watch(() => route.path, () => {
           <button class="relative p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <UIcon name="i-heroicons-bell" class="w-5 h-5" />
             <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+          </button>
+
+          <!-- Dark/Light Mode Toggle -->
+          <button
+            @click="colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'"
+            class="p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            :aria-label="`Switch to ${colorMode.value === 'dark' ? 'light' : 'dark'} mode`"
+          >
+            <UIcon
+              :name="colorMode.value === 'dark' ? 'i-heroicons-sun' : 'i-heroicons-moon'"
+              class="w-5 h-5"
+            />
           </button>
 
           <!-- User Avatar Dropdown -->
