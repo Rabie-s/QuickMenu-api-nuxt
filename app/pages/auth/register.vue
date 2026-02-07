@@ -23,6 +23,9 @@ import type { AuthFormField } from '@nuxt/ui'
 // Store validation errors for each field
 const errors = ref<Record<string, string>>({})
 
+// Nuxt Auth Sanctum
+const { login } = useSanctumAuth()
+
 const fields = computed<AuthFormField[]>(() => [
   {
     name: 'full_name',
@@ -65,12 +68,20 @@ async function onSubmit(payload: any) {
   errors.value = {}
 
   try {
-    const res = await $fetch(`${config.public.API_BASE_URL}/v1/user/auth/register`, {
+    // Register the user
+    await $fetch(`${config.public.API_BASE_URL}/v1/user/auth/register`, {
       method: 'POST',
       body: payload.data,
     })
 
-    console.log('Registration successful:', res)
+    // Auto-login after successful registration
+    await login({
+      email: payload.data.email,
+      password: payload.data.password
+    } as any)
+
+    // Redirect to dashboard or home page
+    await navigateTo('/')
   } catch (error: any) {
     // Handle Laravel validation errors (422)
     if (error.statusCode === 422 && error.data?.errors) {

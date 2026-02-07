@@ -1,27 +1,66 @@
 <script setup lang="ts">
 import type { AuthFormField } from '@nuxt/ui'
 
-const fields: AuthFormField[] = [
+// Store validation errors for each field
+const errors = ref<Record<string, string>>({})
+
+// Nuxt Auth Sanctum
+const { login, isAuthenticated } = useSanctumAuth()
+
+const fields = computed<AuthFormField[]>(() => [
   {
     name: 'email',
     type: 'email',
     label: 'Email',
     placeholder: 'you@example.com',
-    required: true
+    required: true,
+    error: errors.value.email || undefined
   },
   {
     name: 'password',
     label: 'Password',
     type: 'password',
     placeholder: 'Enter your password',
-    required: true
+    required: true,
+    error: errors.value.password || undefined
   }
-]
+])
 
-function onSubmit(payload: any) {
-  console.log('Login submitted:', payload.data)
-  // TODO: Implement login logic
+async function onSubmit(payload: any) {
+  // Clear previous errors
+  errors.value = {}
+
+  try {
+    await login({
+      email: payload.data.email,
+      password: payload.data.password
+    } as any)
+
+    // Redirect to dashboard or home page
+    await navigateTo('/')
+  } catch (error: any) {
+    // Handle Laravel validation errors (422)
+    if (error.statusCode === 422 && error.data?.errors) {
+      const errorMessages = error.data.errors
+
+      // Map Laravel errors to form fields
+      for (const [field, messages] of Object.entries(errorMessages)) {
+        const message = Array.isArray(messages) ? messages[0] : messages
+        errors.value[field] = String(message)
+      }
+    } else {
+      // Handle other errors (invalid credentials, etc.)
+      errors.value.email = error.data?.message || 'Invalid credentials'
+    }
+  }
 }
+
+// Redirect if already authenticated
+watchEffect(() => {
+  if (isAuthenticated.value) {
+    navigateTo('/')
+  }
+})
 </script>
 
 <template>

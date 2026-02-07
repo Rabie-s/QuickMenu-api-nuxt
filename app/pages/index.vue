@@ -21,11 +21,14 @@
         </div>
 
         <div class="flex flex-col sm:flex-row gap-3 justify-center pt-4">
-          <UButton size="lg" to="/auth/register" class="justify-center">
+          <UButton v-if="!isAuthenticated" size="lg" to="/auth/register" class="justify-center">
             Get Started Free
           </UButton>
-          <UButton size="lg" color="neutral" variant="outline" to="/auth/login" class="justify-center">
+          <UButton v-if="!isAuthenticated" size="lg" color="neutral" variant="outline" to="/auth/login" class="justify-center">
             Sign In
+          </UButton>
+          <UButton v-if="isAuthenticated" size="lg" to="/dashboard" class="justify-center">
+            Go to Dashboard
           </UButton>
         </div>
       </div>
@@ -206,6 +209,9 @@
 </template>
 
 <script setup lang="ts">
+// Get auth state
+const { user, isAuthenticated } = useSanctumAuth()
+
 useHead({
   title: 'QuickMenu - Restaurant Menu Management'
 })
