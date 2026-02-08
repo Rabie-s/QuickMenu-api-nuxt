@@ -34,7 +34,7 @@ export default defineNuxtConfig({
   },
 
   sanctum: {
-    baseUrl: 'http://127.0.0.1:8000',
+    baseUrl: 'http://localhost:8000',
     endpoints: {
       login: '/api/v1/user/auth/login',
       logout: '/api/v1/user/logout',
