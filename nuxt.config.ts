@@ -29,24 +29,35 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      API_BASE_URL: 'http://localhost:8000/api'
+      API_BASE_URL: 'http://localhost:8000/api',
     }
   },
 
   sanctum: {
-    baseUrl: 'http://localhost:8000',
+    baseUrl: 'http://localhost:8000', // Laravel API URL
+    origin: 'http://localhost:3000', // Nuxt app URL
+    userStateKey: 'sanctum.user.identity', // Custom state key for user object
+    redirectIfAuthenticated: false,
+    redirectIfUnauthenticated: false,
     endpoints: {
+      csrf: '/sanctum/csrf-cookie',
       login: '/api/v1/user/auth/login',
-      logout: '/api/v1/user/logout',
-      user: '/api/v1/user/auth/me'
+      logout: '/api/v1/user/auth/logout',
+      user: '/api/v1/user/auth/me',
     },
-    // For CSR (Client-Side Rendering) mode
-    origin: 'http://localhost:3000',
-    // Use server middleware to proxy requests (bypasses CORS)
-    mode: 'cookie',
-    // Redirect to login page when not authenticated
+    csrf: {
+      cookie: 'XSRF-TOKEN',
+      header: 'X-XSRF-TOKEN',
+    },
+    client: {
+      retry: false,
+    },
     redirect: {
-      keepRequestedRoute: true
-    }
-  }
+      keepRequestedRoute: true,
+      onLogin: '/dashboard',
+      onLogout: '/login',
+      onAuthOnly: '/login',
+      onGuestOnly: '/',
+    },
+  },
 })

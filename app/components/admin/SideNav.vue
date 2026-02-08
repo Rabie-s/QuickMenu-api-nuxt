@@ -1,82 +1,3 @@
-<script setup lang="ts">
-import { onClickOutside } from '@vueuse/core'
-
-const colorMode = useColorMode()
-
-interface NavItem {
-  label: string
-  icon: string
-  to?: string
-  children?: NavItem[]
-}
-
-const navigation = ref<NavItem[]>([
-  {
-    label: 'Dashboard',
-    icon: 'i-heroicons-home',
-    to: '/admin'
-  },
-  {
-    label: 'My Menus',
-    icon: 'i-heroicons-cube',
-    to: '/admin/my-menus'
-  },
-  {
-    label: 'Catalog',
-    icon: 'i-heroicons-folder',
-    children: [
-      { label: 'Categories', icon: 'i-heroicons-tag', to: '/admin/catalog/categories' },
-      { label: 'Brands', icon: 'i-heroicons-bookmark', to: '/admin/catalog/brands' },
-      { label: 'Attributes', icon: 'i-heroicons-list-bullet', to: '/admin/catalog/attributes' }
-    ]
-  },
-])
-
-const openDropdowns = ref<Set<string>>(new Set())
-const isMobileMenuOpen = ref(false)
-const isAvatarDropdownOpen = ref(false)
-
-const avatarMenuRef = ref<HTMLElement | null>(null)
-
-function toggleDropdown(label: string) {
-  if (openDropdowns.value.has(label)) {
-    openDropdowns.value.delete(label)
-  } else {
-    openDropdowns.value.add(label)
-  }
-}
-
-function isDropdownOpen(label: string): boolean {
-  return openDropdowns.value.has(label)
-}
-
-function toggleMobileMenu() {
-  isMobileMenuOpen.value = !isMobileMenuOpen.value
-}
-
-function closeMobileMenu() {
-  isMobileMenuOpen.value = false
-}
-
-function toggleAvatarDropdown() {
-  isAvatarDropdownOpen.value = !isAvatarDropdownOpen.value
-}
-
-function closeAvatarDropdown() {
-  isAvatarDropdownOpen.value = false
-}
-
-// Close dropdowns when clicking outside
-onClickOutside(avatarMenuRef, closeAvatarDropdown)
-
-// Close mobile menu on route change
-const route = useRoute()
-watch(() => route.path, () => {
-  closeMobileMenu()
-  closeAvatarDropdown()
-})
-</script>
-
 <template>
   <div class="min-h-screen bg-gray-50 dark:bg-gray-950">
     <!-- Top Header -->
@@ -163,7 +84,7 @@ watch(() => route.path, () => {
 
                   <button
                     class="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
-                    @click="closeAvatarDropdown"
+                    @click="logout()"
                   >
                     <UIcon name="i-heroicons-arrow-left-on-rectangle" class="w-4 h-4" />
                     <span>Logout</span>
@@ -263,3 +184,82 @@ watch(() => route.path, () => {
     </main>
   </div>
 </template>
+<script setup lang="ts">
+import { onClickOutside } from '@vueuse/core'
+const { user,logout } = useSanctumAuth();
+console.log(user)
+const colorMode = useColorMode()
+
+interface NavItem {
+  label: string
+  icon: string
+  to?: string
+  children?: NavItem[]
+}
+
+const navigation = ref<NavItem[]>([
+  {
+    label: 'Dashboard',
+    icon: 'i-heroicons-home',
+    to: '/admin'
+  },
+  {
+    label: 'My Menus',
+    icon: 'i-heroicons-cube',
+    to: '/admin/my-menus'
+  },
+  {
+    label: 'Catalog',
+    icon: 'i-heroicons-folder',
+    children: [
+      { label: 'Categories', icon: 'i-heroicons-tag', to: '/admin/catalog/categories' },
+      { label: 'Brands', icon: 'i-heroicons-bookmark', to: '/admin/catalog/brands' },
+      { label: 'Attributes', icon: 'i-heroicons-list-bullet', to: '/admin/catalog/attributes' }
+    ]
+  },
+])
+
+const openDropdowns = ref<Set<string>>(new Set())
+const isMobileMenuOpen = ref(false)
+const isAvatarDropdownOpen = ref(false)
+
+const avatarMenuRef = ref<HTMLElement | null>(null)
+
+function toggleDropdown(label: string) {
+  if (openDropdowns.value.has(label)) {
+    openDropdowns.value.delete(label)
+  } else {
+    openDropdowns.value.add(label)
+  }
+}
+
+function isDropdownOpen(label: string): boolean {
+  return openDropdowns.value.has(label)
+}
+
+function toggleMobileMenu() {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value
+}
+
+function closeMobileMenu() {
+  isMobileMenuOpen.value = false
+}
+
+function toggleAvatarDropdown() {
+  isAvatarDropdownOpen.value = !isAvatarDropdownOpen.value
+}
+
+function closeAvatarDropdown() {
+  isAvatarDropdownOpen.value = false
+}
+
+// Close dropdowns when clicking outside
+onClickOutside(avatarMenuRef, closeAvatarDropdown)
+
+// Close mobile menu on route change
+const route = useRoute()
+watch(() => route.path, () => {
+  closeMobileMenu()
+  closeAvatarDropdown()
+})
+</script>
