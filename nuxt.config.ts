@@ -1,10 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: [
-    '@nuxt/eslint',
-    '@nuxt/ui',
-    'nuxt-auth-sanctum'
-  ],
+  modules: ['@nuxt/eslint', '@nuxt/ui', 'nuxt-auth-sanctum', '@nuxt/hints'],
 
   devtools: {
     enabled: true
@@ -54,8 +50,8 @@ export default defineNuxtConfig({
     },
     redirect: {
       keepRequestedRoute: true,
-      onLogin: '/dashboard',
-      onLogout: '/login',
+      onLogin: '/admin',
+      onLogout: '/auth/login',
       onAuthOnly: '/login',
       onGuestOnly: '/',
     },

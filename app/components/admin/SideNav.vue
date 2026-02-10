@@ -187,7 +187,6 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core'
 const { user,logout } = useSanctumAuth();
-console.log(user)
 const colorMode = useColorMode()
 
 interface NavItem {
@@ -208,15 +207,15 @@ const navigation = ref<NavItem[]>([
     icon: 'i-heroicons-cube',
     to: '/admin/my-menus'
   },
-  {
-    label: 'Catalog',
-    icon: 'i-heroicons-folder',
-    children: [
-      { label: 'Categories', icon: 'i-heroicons-tag', to: '/admin/catalog/categories' },
-      { label: 'Brands', icon: 'i-heroicons-bookmark', to: '/admin/catalog/brands' },
-      { label: 'Attributes', icon: 'i-heroicons-list-bullet', to: '/admin/catalog/attributes' }
-    ]
-  },
+  // {
+  //   label: 'Catalog',
+  //   icon: 'i-heroicons-folder',
+  //   children: [
+  //     { label: 'Categories', icon: 'i-heroicons-tag', to: '/admin/catalog/categories' },
+  //     { label: 'Brands', icon: 'i-heroicons-bookmark', to: '/admin/catalog/brands' },
+  //     { label: 'Attributes', icon: 'i-heroicons-list-bullet', to: '/admin/catalog/attributes' }
+  //   ]
+  // },
 ])
 
 const openDropdowns = ref<Set<string>>(new Set())

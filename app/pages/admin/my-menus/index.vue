@@ -11,27 +11,57 @@
       </UButton>
     </div>
 
-    <!-- Restaurant Card -->
-    <AdminRestaurantCard
-      title="Restaurant Name"
 
-      @details="handleDetails"
-      @edit="handleEdit"
-      @delete="handleDelete"
-    />
+    <div class="grid gap-4">
+
+      <ClientOnly>
+        <template v-if="menus && menus.length > 0">
+          <AdminRestaurantCard v-for="menu in menus" :title="menu.name" :image="menu.cover_image
+            ? `http://localhost:8000/storage/${menu.cover_image}`
+            : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkx2iMfk3hb9vN7shqssP8WEZZRg7v4Yjr3w&s'"
+            :isAvailable="menu.is_available"
+            @delete="deleteMenu(menu.uuid)"
+            />
+        </template>
+        <div v-else class="text-center py-12">
+          <p class="text-gray-500 dark:text-gray-400">No menus found. Create your first menu to get started!</p>
+        </div>
+      </ClientOnly>
+
+
+    </div>
+
+
   </div>
 </template>
 
 <script lang="ts" setup>
-const handleDetails = () => {
-  console.log('Details clicked')
+const client = useSanctumClient();
+
+const {
+  data:menus,
+  status,
+  error,
+  refresh,
+  pending
+} = await useAsyncData('menus',
+  () => client('/api/v1/user/menu'),
+  {
+    // Transform the nested data immediately
+    transform: (response) => response?.data?.data,
+
+  }
+);
+
+
+async function deleteMenu(menuUUID:string){
+   const { error,data,status } = await useSanctumFetch(`/api/v1/user/menu/${menuUUID}`, {
+    method: 'DELETE',
+  })
+  refresh()
+  console.log(status.value)
 }
 
-const handleEdit = () => {
-  console.log('Edit clicked')
-}
 
-const handleDelete = () => {
-  console.log('Delete clicked')
-}
+
 </script>

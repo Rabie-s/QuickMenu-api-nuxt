@@ -62,18 +62,39 @@ const fields = computed<AuthFormField[]>(() => [
 ])
 
 async function onSubmit(payload: any) {
-  const config = useRuntimeConfig()
-
   // Clear previous errors
   errors.value = {}
 
-  try {
-    // Register the user
-    await $fetch(`${config.public.API_BASE_URL}/v1/user/auth/register`, {
-      method: 'POST',
-      body: payload.data,
-    })
+  const { data, error } = await useSanctumFetch('/api/v1/user/auth/register', {
+    method: 'POST',
+    body: payload.data,
+  })
 
+  // Check for errors
+  if (error.value) {
+    const err = error.value
+
+    // Handle Laravel validation errors (422)
+    if (err.statusCode === 422 && err.data?.errors) {
+      const errorMessages = err.data.errors
+
+      // Map Laravel errors to form fields
+      for (const [field, messages] of Object.entries(errorMessages)) {
+        const message = Array.isArray(messages) ? messages[0] : messages
+        errors.value[field] = String(message)
+      }
+    } else if (err.data?.message) {
+      // Handle other errors with message from new API format
+      errors.value.email = err.data.message
+    } else {
+      // Handle unknown errors
+      errors.value.email = 'Registration failed. Please try again.'
+    }
+    return
+  }
+
+  // Check if registration was successful
+  if (data.value?.success) {
     // Auto-login after successful registration
     await login({
       email: payload.data.email,
@@ -82,17 +103,6 @@ async function onSubmit(payload: any) {
 
     // Redirect to dashboard or home page
     await navigateTo('/')
-  } catch (error: any) {
-    // Handle Laravel validation errors (422)
-    if (error.statusCode === 422 && error.data?.errors) {
-      const errorMessages = error.data.errors
-
-      // Map Laravel errors to form fields
-      for (const [field, messages] of Object.entries(errorMessages)) {
-        const message = Array.isArray(messages) ? messages[0] : messages
-        errors.value[field] = String(message)
-      }
-    }
   }
 }
 </script>

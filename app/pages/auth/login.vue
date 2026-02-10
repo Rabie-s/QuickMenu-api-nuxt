@@ -48,9 +48,12 @@ async function onSubmit(payload: any) {
         const message = Array.isArray(messages) ? messages[0] : messages
         errors.value[field] = String(message)
       }
+    } else if (error.data?.message) {
+      // Handle other errors with message from new API format
+      errors.value.email = error.data.message
     } else {
-      // Handle other errors (invalid credentials, etc.)
-      errors.value.email = error.data?.message || 'Invalid credentials'
+      // Handle unknown errors
+      errors.value.email = 'Invalid credentials'
     }
   }
 }
