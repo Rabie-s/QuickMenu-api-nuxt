@@ -68,9 +68,9 @@
             />
           </div>
 
-          <div class="space-y-1">
+          <div v-if="categories && categories.length > 0" class="space-y-1">
             <UButton
-              v-for="category in menuCategories"
+              v-for="category in categories"
               :key="category.id"
               :to="`/admin/menu-creator/category/${category.id}`"
               color="neutral"
@@ -79,14 +79,15 @@
               size="sm"
             >
               <template #leading>
-                <UIcon :name="category.icon" class="size-4" />
+                <UIcon :name="category.icon || 'i-heroicons-squares-2x2'" class="size-4" />
               </template>
               {{ category.name }}
               <template #trailing>
-                <span class="text-xs text-[var(--ui-text-muted)]">{{ category.itemCount }}</span>
+                <span v-if="category.itemCount" class="text-xs text-[var(--ui-text-muted)]">{{ category.itemCount }}</span>
               </template>
             </UButton>
           </div>
+          <p v-else class="text-xs text-[var(--ui-text-muted)]">No categories yet</p>
         </div>
       </div>
 
@@ -118,18 +119,21 @@
 </template>
 
 <script lang="ts" setup>
+interface Category {
+  id: string | number
+  name: string
+  icon?: string
+  itemCount?: number
+}
+
+const props = defineProps<{
+  categories?: Category[]
+}>()
+
 // Restaurant form state
 const restaurantForm = reactive({
   name: 'My Restaurant'
 })
-
-// Static menu categories for testing
-const menuCategories = ref([
-  { id: 1, name: 'Appetizers', icon: 'i-heroicons-fire', itemCount: 12 },
-  { id: 2, name: 'Main Courses', icon: 'i-heroicons-rectangle-stack', itemCount: 24 },
-  { id: 3, name: 'Desserts', icon: 'i-heroicons-cake', itemCount: 8 },
-  { id: 4, name: 'Beverages', icon: 'i-heroicons-beaker', itemCount: 15 },
-])
 
 // Methods
 const goBack = () => {

@@ -16,12 +16,18 @@
 
       <ClientOnly>
         <template v-if="menus && menus.length > 0">
-          <AdminRestaurantCard v-for="menu in menus" :title="menu.name" :image="menu.cover_image
-            ? `http://localhost:8000/storage/${menu.cover_image}`
-            : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkx2iMfk3hb9vN7shqssP8WEZZRg7v4Yjr3w&s'"
+          <AdminRestaurantCard
+            v-for="menu in menus"
+            :key="menu.uuid"
+            :uuid="menu.uuid"
+            :title="menu.name"
+            :image="menu.cover_image
+              ? `http://localhost:8000/storage/${menu.cover_image}`
+              : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkx2iMfk3hb9vN7shqssP8WEZZRg7v4Yjr3w&s'"
             :isAvailable="menu.is_available"
             @delete="deleteMenu(menu.uuid)"
-            />
+            @edit="selectedMenu = menu"
+          />
         </template>
         <div v-else class="text-center py-12">
           <p class="text-gray-500 dark:text-gray-400">No menus found. Create your first menu to get started!</p>
@@ -30,6 +36,13 @@
 
 
     </div>
+
+    <!-- Edit Modal Component -->
+    <AdminMenuEditModal
+      :menu="selectedMenu"
+      @success="handleSuccess"
+      @close="selectedMenu = null"
+    />
 
 
   </div>
@@ -53,13 +66,18 @@ const {
   }
 );
 
+// Edit modal
+const selectedMenu = ref<any>(null)
+
+function handleSuccess() {
+  refresh()
+}
 
 async function deleteMenu(menuUUID:string){
    const { error,data,status } = await useSanctumFetch(`/api/v1/user/menu/${menuUUID}`, {
     method: 'DELETE',
   })
   refresh()
-  console.log(status.value)
 }
 
 

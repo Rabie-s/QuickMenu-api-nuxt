@@ -31,9 +31,9 @@
           variant="outline"
           size="sm"
           class="flex-1 sm:flex-none"
-          @click="$emit('details')"
+          :to="`/admin/my-menus/menus/${uuid}`"
         >
-          Details
+          Manage a menu
         </UButton>
         <UButton
           icon="i-heroicons-pencil"
@@ -62,6 +62,7 @@
 
 <script lang="ts" setup>
 interface Props {
+  uuid: string
   image?: string
   title: string
   description?: string
@@ -75,7 +76,6 @@ withDefaults(defineProps<Props>(), {
 })
 
 defineEmits<{
-  details: []
   edit: []
   delete: []
 }>()
