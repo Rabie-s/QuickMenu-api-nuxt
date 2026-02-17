@@ -54,7 +54,7 @@
           <ClientOnly>
             <!-- Categories list with edit/delete actions -->
             <div v-if="displayCategories && displayCategories.length > 0" class="space-y-1">
-              <div v-for="category in displayCategories" :key="category.id" class="group flex items-center gap-1">
+              <div v-for="category in displayCategories" :key="category.id" class="flex items-center gap-1 group">
                 <!-- Category button -->
                 <UButton
                   :to="`/admin/my-menus/menus/${currentMenuUuid}/categories/${category.id}`"
@@ -69,26 +69,28 @@
                   {{ category.name }}
                 </UButton>
 
-                <!-- Edit button (shows on hover) -->
-                <UButton
-                  icon="i-heroicons-pencil"
-                  color="neutral"
-                  variant="ghost"
-                  size="sm"
-                  class="opacity-0 group-hover:opacity-100 transition-opacity"
-                  @click.stop="openEditModal(category)"
-                />
+                <!-- Actions container -->
+                <div class="flex items-center gap-0.5">
+                  <!-- Edit button -->
+                  <UButton
+                    icon="i-heroicons-pencil"
+                    color="neutral"
+                    variant="ghost"
+                    size="xs"
+                    @click.stop="openEditModal(category)"
+                  />
 
-                <!-- Delete button (shows on hover) -->
-                <UButton
-                  icon="i-heroicons-trash"
-                  color="error"
-                  variant="ghost"
-                  size="sm"
-                  class="opacity-0 group-hover:opacity-100 transition-opacity"
-                  :loading="deletingCategoryId === category.id"
-                  @click.stop="deleteCategory(category.id)"
-                />
+                  <!-- Delete button -->
+                  <UButton
+                    icon="i-heroicons-trash"
+                    color="error"
+                    variant="ghost"
+                    size="xs"
+                    :loading="deletingCategoryId === category.id"
+                    :disabled="deletingCategoryId !== null"
+                    @click.stop="deleteCategory(category.id)"
+                  />
+                </div>
               </div>
             </div>
 

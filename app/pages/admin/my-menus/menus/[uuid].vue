@@ -1,5 +1,5 @@
 <template>
-  <!-- Main content - will be populated when selecting a category -->
+  test
 </template>
 
 <script setup lang="ts">
