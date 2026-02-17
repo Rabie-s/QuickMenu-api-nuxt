@@ -48,7 +48,7 @@
               <UIcon name="i-heroicons-squares-2x2" class="size-4" />
               Menu Categories
             </div>
-            <UButton icon="i-heroicons-plus" size="xs" color="primary" variant="soft" @click="addCategory" />
+            <UButton icon="i-heroicons-plus" size="xs" color="primary" variant="soft" @click="openCreateModal" />
           </div>
 
           <ClientOnly>
@@ -76,7 +76,7 @@
                   variant="ghost"
                   size="sm"
                   class="opacity-0 group-hover:opacity-100 transition-opacity"
-                  @click.stop="editCategory(category.id)"
+                  @click.stop="openEditModal(category)"
                 />
 
                 <!-- Delete button (shows on hover) -->
@@ -111,6 +111,21 @@
 
       <slot />
     </UDashboardPanel>
+
+    <!-- Create Category Modal -->
+    <AdminCategoryCreateCategoryModal
+      v-model:open="isCreateModalOpen"
+      :menu-uuid="currentMenuUuid"
+      @success="handleModalSuccess"
+    />
+
+    <!-- Edit Category Modal -->
+    <AdminCategoryEditCategoryModal
+      v-model:open="isEditModalOpen"
+      :menu-uuid="currentMenuUuid"
+      :category="editingCategory"
+      @success="handleModalSuccess"
+    />
   </UDashboardGroup>
 </template>
 
@@ -149,8 +164,13 @@ const currentMenuUuid = computed(() => {
 // Restaurant form
 const restaurantForm = reactive({ name: 'My Restaurant' })
 
-// Loading state
+// Loading states
 const deletingCategoryId = ref<string | number | null>(null)
+
+// Modal states
+const isCreateModalOpen = ref(false)
+const isEditModalOpen = ref(false)
+const editingCategory = ref<Category | null>(null)
 
 // Actions
 const goBack = () => navigateTo('/admin')
@@ -159,12 +179,21 @@ const saveRestaurantInfo = () => {
   // TODO: Implement save logic
 }
 
-const addCategory = () => {
-  navigateTo(`/admin/my-menus/menus/${currentMenuUuid.value}/categories/new`)
+// Open create modal
+const openCreateModal = () => {
+  isCreateModalOpen.value = true
 }
 
-const editCategory = (categoryId: string | number) => {
-  navigateTo(`/admin/my-menus/menus/${currentMenuUuid.value}/categories/${categoryId}/edit`)
+// Open edit modal
+const openEditModal = (category: Category) => {
+  editingCategory.value = category
+  isEditModalOpen.value = true
+}
+
+// Handle modal success (optional callback)
+const handleModalSuccess = () => {
+  // Modal already handles state updates
+  // This is just for any additional actions if needed
 }
 
 const deleteCategory = async (categoryId: string | number) => {
@@ -182,13 +211,13 @@ const deleteCategory = async (categoryId: string | number) => {
     // Show success message
     alert('Category deleted successfully')
 
-    // Refresh categories list
-    await refreshNuxtData(`menu-${currentMenuUuid.value}-categories`)
-
-    // Update shared state
+    // Update shared state immediately
     if (sharedCategories.value) {
       sharedCategories.value = sharedCategories.value.filter((c: Category) => c.id !== categoryId)
     }
+
+    // Refresh categories list in background
+    await refreshNuxtData(`menu-${currentMenuUuid.value}-categories`)
   } catch (error) {
     console.error('Failed to delete category:', error)
     alert('Failed to delete category')
