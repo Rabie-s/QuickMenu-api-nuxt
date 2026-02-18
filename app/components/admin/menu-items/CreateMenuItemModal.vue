@@ -1,20 +1,33 @@
 <template>
   <UModal v-model:open="isOpen" title="Create New Menu Item">
     <template #body>
+      <!-- Error Alert -->
+      <UAlert
+        v-if="errorMessage"
+        icon="i-heroicons-exclamation-triangle"
+        color="error"
+        variant="subtle"
+        :title="errorTitle"
+        :description="errorMessage"
+        class="mb-4"
+        close-button
+        @close="clearError"
+      />
+
       <UForm :state="form" class="space-y-4" @submit="handleSubmit">
-        <UFormField label="Item Name" name="name" required>
+        <UFormField label="Item Name" name="name" required :error="validationErrors.name">
           <UInput v-model="form.name" placeholder="Enter item name" class="w-full" size="lg" />
         </UFormField>
 
-        <UFormField label="Price" name="price" required>
+        <UFormField label="Price" name="price" required :error="validationErrors.price">
           <UInput v-model="form.price" type="number" step="0.01" placeholder="0.00" class="w-full" size="lg" />
         </UFormField>
 
-        <UFormField label="Description" name="description">
+        <UFormField label="Description" name="description" :error="validationErrors.description">
           <UTextarea v-model="form.description" placeholder="Enter item description" class="w-full" :rows="3" />
         </UFormField>
 
-        <UFormField label="Image" name="image">
+        <UFormField label="Image" name="image" :error="validationErrors.image">
           <!-- Image Preview -->
           <div v-if="imagePreview" class="mb-3">
             <img :src="imagePreview" alt="Preview" class="w-32 h-32 object-cover rounded-lg border border-gray-200 dark:border-gray-700" />
@@ -95,6 +108,18 @@ const fileInputRef = ref<HTMLInputElement | null>(null)
 const imageFile = ref<File | null>(null)
 const imagePreview = ref<string | null>(null)
 
+// Error states
+const errorMessage = ref<string | null>(null)
+const errorTitle = ref<string>('Error')
+const validationErrors = reactive<Record<string, string>>({})
+
+// Clear error states
+const clearError = () => {
+  errorMessage.value = null
+  errorTitle.value = 'Error'
+  Object.keys(validationErrors).forEach(key => delete validationErrors[key])
+}
+
 // File handling functions
 const selectFile = () => {
   fileInputRef.value?.click()
@@ -125,6 +150,7 @@ const removeImage = () => {
 // Reset form when modal opens
 watch(() => props.open, (isOpen) => {
   if (isOpen) {
+    clearError()
     form.name = ''
     form.price = ''
     form.description = ''
@@ -140,6 +166,7 @@ watch(() => props.open, (isOpen) => {
 
 // Handle cancel
 const handleCancel = (close: () => void) => {
+  clearError()
   form.name = ''
   form.price = ''
   form.description = ''
@@ -153,15 +180,60 @@ const handleCancel = (close: () => void) => {
   close()
 }
 
+// Extract validation errors from API response
+const extractValidationErrors = (error: any) => {
+  clearError()
+
+  // Handle Laravel validation errors
+  if (error?.data?.errors) {
+    const errors = error.data.errors
+    Object.keys(errors).forEach(key => {
+      validationErrors[key] = Array.isArray(errors[key]) ? errors[key][0] : errors[key]
+    })
+    errorTitle.value = 'Validation Error'
+    errorMessage.value = 'Please fix the errors below and try again.'
+    return true
+  }
+
+  // Handle general error message
+  if (error?.data?.message) {
+    errorTitle.value = 'Error'
+    errorMessage.value = error.data.message
+    return true
+  }
+
+  // Handle error with statusText
+  if (error?.statusText) {
+    errorTitle.value = `Error ${error.status || ''}`
+    errorMessage.value = error.statusText
+    return true
+  }
+
+  // Generic error
+  errorTitle.value = 'Error'
+  errorMessage.value = 'An unexpected error occurred. Please try again.'
+  return true
+}
+
 // Handle submit
 const handleSubmit = async () => {
+  // Clear previous errors
+  clearError()
+
+  // Client-side validation
   if (!form.name.trim()) {
-    alert('Please enter an item name')
+    validationErrors.name = 'Item name is required'
     return
   }
 
   if (!form.price) {
-    alert('Please enter a price')
+    validationErrors.price = 'Price is required'
+    return
+  }
+
+  const priceValue = parseFloat(form.price)
+  if (isNaN(priceValue) || priceValue < 0) {
+    validationErrors.price = 'Please enter a valid price'
     return
   }
 
@@ -171,7 +243,7 @@ const handleSubmit = async () => {
     // Prepare form data
     let body: any = {
       name: form.name,
-      price: parseFloat(form.price),
+      price: priceValue,
       description: form.description,
       is_available: form.is_available
     }
@@ -180,7 +252,7 @@ const handleSubmit = async () => {
     if (imageFile.value) {
       const formData = new FormData()
       formData.append('name', form.name)
-      formData.append('price', String(parseFloat(form.price)))
+      formData.append('price', String(priceValue))
       formData.append('description', form.description || '')
       formData.append('is_available', String(form.is_available))
       formData.append('image', imageFile.value)
@@ -193,12 +265,12 @@ const handleSubmit = async () => {
 
     const { data, error } = await useSanctumFetch(`/api/v1/user/menus/${props.menuUuid}/categories/${props.categoryId}/items`, {
       method: 'POST',
-      body: body,
-      headers: imageFile.value ? undefined : undefined // Let browser set Content-Type for FormData
+      body: body
     })
 
     if (error.value) {
-      throw error.value
+      extractValidationErrors(error.value)
+      return
     }
 
     // Reset form
@@ -221,9 +293,8 @@ const handleSubmit = async () => {
 
     // Refresh menu items list
     await refreshNuxtData(`menu-${props.menuUuid}-category-${props.categoryId}-items`)
-  } catch (error) {
-    console.error('Failed to create menu item:', error)
-    alert('Failed to create menu item')
+  } catch (error: any) {
+    extractValidationErrors(error)
   } finally {
     isSubmitting.value = false
   }

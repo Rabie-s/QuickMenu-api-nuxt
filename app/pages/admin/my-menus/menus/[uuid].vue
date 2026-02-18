@@ -23,10 +23,12 @@
       <!-- Bottom Row: Filter & Sort Options -->
       <div class="flex items-center gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Filter:</span>
-        <UButtonGroup size="sm">
+        <div class="flex rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
           <UButton
             :color="filterAvailability === 'all' ? 'primary' : 'neutral'"
             :variant="filterAvailability === 'all' ? 'solid' : 'ghost'"
+            size="sm"
+            class="rounded-none"
             @click="filterAvailability = 'all'"
           >
             All Items
@@ -34,6 +36,8 @@
           <UButton
             :color="filterAvailability === 'available' ? 'primary' : 'neutral'"
             :variant="filterAvailability === 'available' ? 'solid' : 'ghost'"
+            size="sm"
+            class="rounded-none border-l border-gray-200 dark:border-gray-700"
             @click="filterAvailability = 'available'"
           >
             Available
@@ -41,11 +45,13 @@
           <UButton
             :color="filterAvailability === 'unavailable' ? 'primary' : 'neutral'"
             :variant="filterAvailability === 'unavailable' ? 'solid' : 'ghost'"
+            size="sm"
+            class="rounded-none border-l border-gray-200 dark:border-gray-700"
             @click="filterAvailability = 'unavailable'"
           >
             Unavailable
           </UButton>
-        </UButtonGroup>
+        </div>
 
         <div class="flex-1" />
 
@@ -76,40 +82,45 @@
 
     <!-- Menu Items Grid -->
     <div v-if="selectedCategory" class="grid gap-4">
-      <ClientOnly>
-        <template v-if="filteredItems && filteredItems.length > 0">
-          <AdminMenuItemsMenuItemCard
-            v-for="item in filteredItems"
-            :key="item.id"
-            :name="item.name"
-            :description="item.description"
-            :price="Number(item.price)"
-            :image="item.image"
-            :isAvailable="Boolean(item.is_available)"
-            @show="showItem(item)"
-            @edit="editItem(item)"
-            @remove="deleteItem(item.id)"
-          />
-        </template>
-        <div v-else-if="!pendingItems && menuItems && menuItems.length > 0" class="text-center py-12">
-          <UIcon name="i-heroicons-magnifying-glass" class="w-12 h-12 text-gray-400 mx-auto mb-3" />
-          <p class="text-gray-500 dark:text-gray-400">
-            No menu items match your current filter.
-          </p>
-        </div>
-        <div v-else-if="!pendingItems" class="text-center py-12">
-          <UIcon name="i-heroicons-plus-circle" class="w-12 h-12 text-gray-400 mx-auto mb-3" />
-          <p class="text-gray-500 dark:text-gray-400 mb-2">
-            No menu items in this category.
-          </p>
-          <p class="text-sm text-gray-400 dark:text-gray-500">
-            Click "Create New Menu Item" to add your first item!
-          </p>
-        </div>
-        <template #fallback>
-          <p class="text-center py-12 text-gray-500 dark:text-gray-400">Loading menu items...</p>
-        </template>
-      </ClientOnly>
+      <!-- Loading state -->
+      <div v-if="pendingItems" class="text-center py-12">
+        <p class="text-gray-500 dark:text-gray-400">Loading menu items...</p>
+      </div>
+
+      <!-- Items found -->
+      <template v-else-if="filteredItems && filteredItems.length > 0">
+        <AdminMenuItemsMenuItemCard
+          v-for="item in filteredItems"
+          :key="item.id"
+          :name="item.name"
+          :description="item.description"
+          :price="Number(item.price)"
+          :image="item.image"
+          :isAvailable="Boolean(item.is_available)"
+          @show="showItem(item)"
+          @edit="editItem(item)"
+          @remove="deleteItem(item.id)"
+        />
+      </template>
+
+      <!-- Filter matches nothing -->
+      <div v-else-if="menuItems && menuItems.length > 0" class="text-center py-12">
+        <UIcon name="i-heroicons-magnifying-glass" class="w-12 h-12 text-gray-400 mx-auto mb-3" />
+        <p class="text-gray-500 dark:text-gray-400">
+          No menu items match your current filter.
+        </p>
+      </div>
+
+      <!-- Empty state -->
+      <div v-else class="text-center py-12">
+        <UIcon name="i-heroicons-plus-circle" class="w-12 h-12 text-gray-400 mx-auto mb-3" />
+        <p class="text-gray-500 dark:text-gray-400 mb-2">
+          No menu items in this category.
+        </p>
+        <p class="text-sm text-gray-400 dark:text-gray-500">
+          Click "Create New Menu Item" to add your first item!
+        </p>
+      </div>
     </div>
 
     <!-- Create Menu Item Modal -->
@@ -241,14 +252,23 @@ const deleteItem = async (itemId: string | number) => {
   if (!confirm('Are you sure you want to delete this menu item?')) return
 
   try {
-    await useSanctumClient()(`/api/v1/user/menus/${uuid}/categories/${categoryId.value}/items/${itemId}`, {
+    const { error, data } = await useSanctumClient()(`/api/v1/user/menus/${uuid}/categories/${categoryId.value}/items/${itemId}`, {
       method: 'DELETE'
     })
+
+    if (error) {
+      const message = error?.data?.message || error?.statusText || 'Failed to delete menu item'
+      alert(message)
+      return
+    }
+
+    // Show success message using toast/notification if available, otherwise alert
     alert('Menu item deleted successfully')
     refreshItems()
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to delete menu item:', error)
-    alert('Failed to delete menu item')
+    const message = error?.data?.message || error?.message || 'Failed to delete menu item'
+    alert(message)
   }
 }
 </script>

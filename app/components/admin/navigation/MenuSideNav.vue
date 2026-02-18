@@ -117,14 +117,14 @@
     </UDashboardPanel>
 
     <!-- Create Category Modal -->
-    <AdminCategoryCreateCategoryModal
+    <AdminCategoriesCreateCategoryModal
       v-model:open="isCreateModalOpen"
       :menu-uuid="currentMenuUuid"
       @success="handleModalSuccess"
     />
 
     <!-- Edit Category Modal -->
-    <AdminCategoryEditCategoryModal
+    <AdminCategoriesEditCategoryModal
       v-model:open="isEditModalOpen"
       :menu-uuid="currentMenuUuid"
       :category="editingCategory"
