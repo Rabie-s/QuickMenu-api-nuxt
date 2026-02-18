@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(del:*)",
+      "Bash(dir:*)",
+      "Bash(findstr:*)"
     ]
   }
 }

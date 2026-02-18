@@ -2,7 +2,7 @@
   <div class="flex h-screen bg-gray-50 dark:bg-gray-900">
     <!-- Sidebar -->
     <aside class="w-64 bg-white dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800">
-      <AdminSideNav />
+      <AdminNavigationSideNav />
     </aside>
     
     <!-- Main Content -->

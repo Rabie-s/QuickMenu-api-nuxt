@@ -16,7 +16,7 @@
 
       <ClientOnly>
         <template v-if="menus && menus.length > 0">
-          <AdminRestaurantCard
+          <AdminMenusMenuCard
             v-for="menu in menus"
             :key="menu.uuid"
             :uuid="menu.uuid"
@@ -38,7 +38,7 @@
     </div>
 
     <!-- Edit Modal Component -->
-    <AdminMenuEditModal
+    <AdminMenusEditMenuModal
       :menu="selectedMenu"
       @success="handleSuccess"
       @close="selectedMenu = null"

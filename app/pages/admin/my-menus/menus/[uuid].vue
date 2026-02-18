@@ -78,7 +78,7 @@
     <div v-if="selectedCategory" class="grid gap-4">
       <ClientOnly>
         <template v-if="filteredItems && filteredItems.length > 0">
-          <AdminMenuItemCard
+          <AdminMenuItemsMenuItemCard
             v-for="item in filteredItems"
             :key="item.id"
             :name="item.name"
@@ -113,7 +113,7 @@
     </div>
 
     <!-- Create Menu Item Modal -->
-    <AdminMenuCreateMenuItemModal
+    <AdminMenuItemsCreateMenuItemModal
       v-if="categoryId"
       v-model:open="isCreateModalOpen"
       :menu-uuid="uuid"
@@ -122,7 +122,7 @@
     />
 
     <!-- Edit Menu Item Modal -->
-    <AdminMenuEditMenuItemModal
+    <AdminMenuItemsEditMenuItemModal
       v-if="categoryId && editingItem"
       v-model:open="isEditModalOpen"
       :menu-uuid="uuid"

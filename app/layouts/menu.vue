@@ -1,7 +1,7 @@
 <template>
-  <AdminMenuSideNav>
+  <AdminNavigationMenuSideNav>
     <slot />
-  </AdminMenuSideNav>
+  </AdminNavigationMenuSideNav>
 </template>
 
 <script lang="ts" setup>
