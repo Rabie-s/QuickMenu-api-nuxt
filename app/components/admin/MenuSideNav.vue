@@ -57,11 +57,12 @@
               <div v-for="category in displayCategories" :key="category.id" class="flex items-center gap-1 group">
                 <!-- Category button -->
                 <UButton
-                  :to="`/admin/my-menus/menus/${currentMenuUuid}/categories/${category.id}`"
+                  :to="`/admin/my-menus/menus/${currentMenuUuid}?category=${category.id}`"
                   color="neutral"
                   variant="ghost"
                   class="flex-1 justify-start"
                   size="sm"
+                  :active="isCategorySelected(category.id)"
                 >
                   <template #leading>
                     <UIcon :name="category.icon || 'i-heroicons-squares-2x2'" class="size-4" />
@@ -196,6 +197,11 @@ const openEditModal = (category: Category) => {
 const handleModalSuccess = () => {
   // Modal already handles state updates
   // This is just for any additional actions if needed
+}
+
+// Check if category is selected
+const isCategorySelected = (categoryId: string | number) => {
+  return route.query.category === String(categoryId)
 }
 
 const deleteCategory = async (categoryId: string | number) => {
