@@ -3,7 +3,7 @@
     <div class="flex flex-col sm:flex-row gap-4">
       <!-- Image -->
       <img
-        :src="image"
+        :src="formattedImage"
         :alt="name"
         class="w-full h-40 sm:h-24 sm:w-24 rounded-lg object-cover flex-shrink-0"
       >
@@ -53,6 +53,8 @@
 </template>
 
 <script lang="ts" setup>
+import { formatImageUrl } from '~/utils/image'
+
 interface Props {
   image?: string
   name: string
@@ -61,9 +63,12 @@ interface Props {
   isAvailable?: boolean
 }
 
-withDefaults(defineProps<Props>(), {
-  image: 'https://placehold.co/400x400/png',
+const props = withDefaults(defineProps<Props>(), {
+  image: undefined,
   description: 'No description available',
   isAvailable: true
 })
+
+// Format the image URL to handle relative paths
+const formattedImage = computed(() => formatImageUrl(props.image))
 </script>
